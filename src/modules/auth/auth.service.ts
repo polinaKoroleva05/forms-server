@@ -16,7 +16,7 @@ export class AuthService {
     password: string,
   ): Promise<{ access_token: string } | null> {
     const user = this.usersService.findOneByEmail(email);
-
+    
     if (user?.password !== password) {
       return null;
     }
