@@ -5,8 +5,11 @@ import { IUserCreateResponse, IUsersData } from './users.interface';
 import { v4 as uuid } from 'uuid';
 import { findUserByEmail } from './utils';
 import { UserPatchDto } from './dto/userPatch.dto';
+import * as path from 'path';
+import * as fs from 'fs';
 
 export class UsersService {
+  private pathToDB: string = path.join(__dirname, 'db.json');
   private usersDB: Record<string, IUsersData> = {
     '1': {
       name: 'Admin',
