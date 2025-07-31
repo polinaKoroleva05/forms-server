@@ -14,21 +14,29 @@ export class AuthService {
   async login(
     email: string,
     password: string,
-  ): Promise<{ access_token: string } | null> {
-    const user = this.usersService.findOneByEmail(email);
+  ): Promise<{ access_token: string, err?: string } | null > {
+    try{
+        const user = await this.usersService.findOneByEmail(email);
+
+        if (user?.password !== password) {
+          return null;
+        }
     
-    if (user?.password !== password) {
-      return null;
+        const { id, email: userEmail } = user;
+    
+        const payload = { sub: id, email: userEmail };
+    
+        return {
+          access_token: await this.jwtService?.signAsync(payload, {
+            expiresIn: '100d',
+          }),
+        };
+    }catch(err){
+        return {
+          access_token: '',
+          err
+        };
     }
-
-    const { id, email: userEmail } = user;
-
-    const payload = { sub: id, email: userEmail };
-
-    return {
-      access_token: await this.jwtService?.signAsync(payload, {
-        expiresIn: '100d',
-      }),
-    };
+    
   }
 }

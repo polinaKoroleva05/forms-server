@@ -35,22 +35,25 @@ export class UsersController {
   @ApiOperation({ summary: 'Get list of users' })
   @ApiResponse({ status: HttpStatus.OK, description: 'Success', isArray: true })
   @Get()
-  getAll(): UserGetDto[] {
-    return this.usersService.getAll();
+  async getAll(): Promise<UserGetDto[]> {
+    const response = await this.usersService.getAll()
+    return response;
   }
 
   @UseGuards(AuthGuard)
   @Get(':id')
   @ApiOperation({ summary: 'Get user by id' })
-  getUser(@Param('id') id: string): UserGetDto | NotFoundException {
-    return this.usersService.findById(id);
+  async getUser(@Param('id') id: string):Promise< UserGetDto | NotFoundException> {
+    const response = await this.usersService.findById(id)
+    return response;
   }
 
   @UseGuards(AuthGuard)
   @Patch(':id')
   @ApiOperation({ summary: 'Update user' })
-  updateUser(@Param('id') id: string, @Body() data: UserPatchDto) {
-    return this.usersService.updateUser(id, data);
+  async updateUser(@Param('id') id: string, @Body() data: UserPatchDto) {
+    const response = await this.usersService.updateUser(id, data)
+    return response;
   }
 
   @UseGuards(AuthGuard)
@@ -59,15 +62,25 @@ export class UsersController {
   @ApiCreatedResponse({
     description: 'Success',
   })
-  createUser(@Body() data: UserCreateDto): IUserCreateResponse {
-    return this.usersService.createUser(data);
+  async createUser(@Body() data: UserCreateDto): Promise<IUserCreateResponse> {
+    try{
+        let response = await this.usersService.createUser(data);
+        return response
+    }catch(err){
+        console.log('createUser controller', err)
+        return { name: '', id: '' }
+    }
   }
 
   @UseGuards(AuthGuard)
   @ApiOperation({ summary: 'Delete user' })
   @Delete(':id')
-  deleteUser(@Param('id') id: string): string {
-    this.usersService.deleteUser(id);
-    return 'Ok';
+  async deleteUser(@Param('id') id: string): Promise<string> {
+    try{
+        await this.usersService.deleteUser(id);
+        return 'Ok';
+    }catch(err){
+        return 'err' + JSON.stringify(err)
+    }
   }
 }
